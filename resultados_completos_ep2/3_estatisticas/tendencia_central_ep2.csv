@@ -1,0 +1,20 @@
+Variável,Classificação,Média,Mediana,Moda
+Age,Quantitativa,40.09,39.0,35
+Gender,Qualitativa Nominal,N/A (Inadequado para Tipo Nominal),N/A (Inadequado para Tipo Nominal),Female
+Occupation,Qualitativa Nominal,N/A (Inadequado para Tipo Nominal),N/A (Inadequado para Tipo Nominal),Student
+Sleep Hours,Quantitativa,6.61,6.7,6.7
+Physical Activity (hrs/week),Quantitativa,2.98,2.8,1.4
+Caffeine Intake (mg/day),Quantitativa,284.18,272.0,289
+Alcohol Consumption (drinks/week),Quantitativa,9.3,9.0,15
+Smoking,Qualitativa Nominal,N/A (Inadequado para Tipo Nominal),N/A (Inadequado para Tipo Nominal),Yes
+Family History of Anxiety,Qualitativa Nominal,N/A (Inadequado para Tipo Nominal),N/A (Inadequado para Tipo Nominal),Yes
+Stress Level (1-10),Qualitativa Ordinal,N/A (Inadequado para Tipo Ordinal),6,10
+Heart Rate (bpm),Quantitativa,90.39,91.0,112
+Breathing Rate (breaths/min),Quantitativa,20.87,21.0,22
+Sweating Level (1-5),Qualitativa Ordinal,N/A (Inadequado para Tipo Ordinal),3,4
+Dizziness,Qualitativa Nominal,N/A (Inadequado para Tipo Nominal),N/A (Inadequado para Tipo Nominal),No
+Medication,Qualitativa Nominal,N/A (Inadequado para Tipo Nominal),N/A (Inadequado para Tipo Nominal),Yes
+Therapy Sessions (per month),Quantitativa,2.55,2.0,1
+Recent Major Life Event,Qualitativa Nominal,N/A (Inadequado para Tipo Nominal),N/A (Inadequado para Tipo Nominal),Yes
+Diet Quality (1-10),Qualitativa Ordinal,N/A (Inadequado para Tipo Ordinal),5,4
+Anxiety Level (1-10),Quantitativa,4.03,4.0,3.0
