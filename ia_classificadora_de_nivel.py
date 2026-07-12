@@ -1,81 +1,69 @@
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+import joblib
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-# 1. Pré-processamento de Dados
-# Carregamento da base de dados
+# 1. Pré-processamento
 df = pd.read_csv('enhanced_anxiety_dataset.csv')
 
-# Mapeamento de variáveis binárias
 binary_mapping = {'Yes': 1, 'No': 0}
 binary_columns = ['Smoking', 'Family History of Anxiety',
                   'Dizziness', 'Medication', 'Recent Major Life Event']
 for col in binary_columns:
-    df[col] = df[col].map(binary_mapping)
+    if col in df.columns:
+        df[col] = df[col].map(binary_mapping)
 
-# One-Hot Encoding para variáveis nominais
 df = pd.get_dummies(df, columns=['Gender', 'Occupation'], drop_first=True)
 
-# Definição dos recursos (X) e do alvo (y)
 X = df.drop('Anxiety Level', axis=1)
 y = df['Anxiety Level']
 
-# 2. Divisão dos Dados (Holdout 80/20)
-# A semente (random_state=42) garante a reprodutibilidade do experimento
+# 2. Divisão Holdout
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.20, random_state=42)
 
-# 3. Definição dos Modelos e Validação Cruzada (K-Fold)
-# O parâmetro n_jobs=-1 acelera o processamento utilizando todos os núcleos do processador
+# 3. Treinamento
 modelos = {
     "Regressão Linear Múltipla": LinearRegression(),
     "Random Forest Regressor": RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
 }
 
-kf = KFold(n_splits=5, shuffle=True, random_state=42)
+kf = KFold(n_splits=10, shuffle=True, random_state=42)
 
-print("--- Validação Cruzada (Dados de Treino) ---")
+print("--- Validação Cruzada K-Fold (Apenas Treino 80%) ---")
 for nome, modelo in modelos.items():
-    # Calculando MSE negativo e convertendo para positivo
-    scores = cross_val_score(modelo, X_train, y_train,
-                             cv=kf, scoring='neg_mean_squared_error')
-    mse_cv = -scores.mean()
-    print(f"{nome} - MSE Médio no K-Fold: {mse_cv:.4f}")
+    # Avaliação de robustez interna no treino
+    mse_scores = cross_val_score(
+        modelo, X_train, y_train, cv=kf, scoring='neg_mean_squared_error')
+    mae_scores = cross_val_score(
+        modelo, X_train, y_train, cv=kf, scoring='neg_mean_absolute_error')
 
-# 4. Treinamento Final e Avaliação na Base de Teste (20% intocados)
-print("\n--- Avaliação Final (Dados de Teste) ---")
-modelos_treinados = {}
+    print(f"{nome}:")
+    print(f"  MSE Médio Interno: {-mse_scores.mean():.4f}")
+    print(f"  MAE Médio Interno: {-mae_scores.mean():.4f}\n")
 
+# Avaliação Final: Cálculo exato do erro na escala 1-10 usando os 20% intocados
+print("--- Avaliação Final (Dados de Teste 20% Intocados) ---")
 for nome, modelo in modelos.items():
-    # Treinando o modelo com todos os dados de treino
+    # Treinamento definitivo com a totalidade dos 80% de treino
     modelo.fit(X_train, y_train)
-    modelos_treinados[nome] = modelo
 
-    # Prevendo nos dados de teste
+    # Previsão sobre os dados isolados para evitar data leakage
     previsoes = modelo.predict(X_test)
 
-    # Calculando métricas
+    # Métricas de precisão numérica
     mae = mean_absolute_error(y_test, previsoes)
     mse = mean_squared_error(y_test, previsoes)
 
     print(f"{nome}:")
-    print(f"  MAE: {mae:.4f}")
-    print(f"  MSE: {mse:.4f}\n")
+    print(f"  MAE Final: {mae:.4f}")
+    print(f"  MSE Final: {mse:.4f}\n")
 
-# 5. Geração de Gráfico para o Relatório (Feature Importance)
-# Extraindo a importância do modelo Random Forest
-rf_model = modelos_treinados["Random Forest Regressor"]
-importancias = rf_model.feature_importances_
-indices = np.argsort(importancias)[-10:]  # Top 10 variáveis
+# 4. Exportação do Modelo Principal e dos Dados
+rf_model = modelos["Random Forest Regressor"]
+joblib.dump(rf_model, 'modelo_rf_ansiedade.pkl')
+joblib.dump((X_train, X_test, y_train, y_test), 'dados_holdout.pkl')
 
-plt.figure(figsize=(10, 6))
-plt.title('Importância das Variáveis (Random Forest)')
-plt.barh(range(len(indices)), importancias[indices], color='b', align='center')
-plt.yticks(range(len(indices)), [X.columns[i] for i in indices])
-plt.xlabel('Importância Relativa')
-plt.tight_layout()
-plt.show()
+print("\nArquivos 'modelo_rf_ansiedade.pkl' e 'dados_holdout.pkl' salvos com sucesso.")
