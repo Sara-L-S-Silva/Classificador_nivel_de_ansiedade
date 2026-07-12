@@ -14,7 +14,7 @@ X_train, X_test, y_train, y_test = joblib.load('dados_holdout.pkl')
 # --- Questão 1: Interação Sono x Estresse (PDP) ---
 fig, ax = plt.subplots(figsize=(8, 6))
 # Verifique o nome exato da coluna na sua base. Caso possua sufixo, altere abaixo.
-features = [('Sleep Hours', 'Stress Level')]
+features = [('Sleep Hours', 'Stress Level (1-10)')]
 PartialDependenceDisplay.from_estimator(rf_model, X_train, features, ax=ax)
 plt.title("PDP 2D: Interação entre Horas de Sono e Nível de Estresse")
 plt.tight_layout()

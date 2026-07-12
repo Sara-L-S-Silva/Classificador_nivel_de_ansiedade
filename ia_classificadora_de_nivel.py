@@ -17,8 +17,8 @@ for col in binary_columns:
 
 df = pd.get_dummies(df, columns=['Gender', 'Occupation'], drop_first=True)
 
-X = df.drop('Anxiety Level', axis=1)
-y = df['Anxiety Level']
+X = df.drop('Anxiety Level (1-10)', axis=1)
+y = df['Anxiety Level (1-10)']
 
 # 2. Divisão Holdout
 X_train, X_test, y_train, y_test = train_test_split(
